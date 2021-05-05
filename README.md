@@ -12,7 +12,7 @@ Scripts:
 1. Add IG to FHIR.  To Execute:
     node add_ig_to_fhir_store.js
 
-Adds specfied Implementation GUIDE to FHIR Store.  This enables Profile Validation on a given FHIR Store in the Google Cloud. ImplemetationGuides are downloadable distributions that contain a known file strucuture that defines the IGs data structure.
+Adds specfied IMPLEMENTATION_GUIDE to FHIR Store.  Having IG resources stored on the FHIR Server enables Profile Validation on a given FHIR Store in the Google Cloud. ImplemetationGuides are downloadable distributions that contain a known file strucuture that defines the IGs data structure.
 
 This file structure consists of JSON files for the following structural profile FHIR Resources: 
   Implemetation Guide
