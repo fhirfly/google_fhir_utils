@@ -1,13 +1,12 @@
 //Node Module to Add ImplementationGuide to FHIR Store
 const fs = require('fs');
-const IG_DIRECTORY = "C:\\Users\\FHIRFLY\\Downloads\\full-ig\\site\\";
 const {google} = require('googleapis');
 const healthcare = google.healthcare('v1');
-
 const cloudRegion = 'us-central1';
 const projectId = 'fhirfly';
 const datasetId = 'synthea';
-const fhirStoreId = 'carin-bb';
+const fhirStoreId = 'usdf';
+const IG_DIRECTORY = 'C:\\Users\\Richard Braman\\Projects\\igs\\' + fhirStoreId + '\\site\\';
 const bFormatNDJSON = false;
 
 async function installIGtoFHIRStore(){
@@ -30,9 +29,14 @@ async function installIGtoFHIRStore(){
                 }
             }
         });
-        const returnBundle = createFhirResource("Bundle", FhirIGBundle);
+        writeBundletoFS(FhirIGBundle);
+//        const returnBundle = createFhirResource("Bundle", FhirIGBundle);
         console.log(returnBundle);
     });
+}
+
+function writeBundletoFS(budle){
+    fs.writeFileSync(IG_DIRECTORY + "ig_bundle.json", JSON.stringify(bundle));
 }
 
 function createBundle(){
