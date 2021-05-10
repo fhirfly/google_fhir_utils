@@ -5,8 +5,8 @@ const healthcare = google.healthcare('v1');
 const cloudRegion = 'us-central1';
 const projectId = 'fhirfly';
 const datasetId = 'synthea';
-const fhirStoreId = 'usdf';
-const IG_DIRECTORY = 'C:\\Users\\Richard Braman\\Projects\\igs\\' + fhirStoreId + '\\site\\';
+const fhirStoreId = 'plan-net';
+const IG_DIRECTORY = 'C:\\Users\\richb\\Projects\\igs\\' + fhirStoreId + '\\full-ig\\site\\';
 const bFormatNDJSON = false;
 
 async function installIGtoFHIRStore(){
@@ -17,11 +17,13 @@ async function installIGtoFHIRStore(){
         return;
         }
         filenames.forEach(function(filename) {
-            if ((filename.startsWith("Structure") || filename.startsWith("ValueSet") || filename.startsWith("CodeSystem")  || filename.startsWith("CapabilityStatement") || filename.startsWith("ImplementationGuide") || filename.startsWith("ImplementationGuide")) && filename.endsWith(".json")){
+            if ((filename.startsWith("CapabilityStatement") || filename.startsWith("Structure") || filename.startsWith("ValueSet") || filename.startsWith("CodeSystem")  || filename.startsWith("ImplementationGuide") || filename.startsWith("ImplementationGuide")) && filename.endsWith(".json")){
                 try {
                     var content = fs.readFileSync(IG_DIRECTORY + filename);
                     var content = JSON.parse(content.toString());
-                    addResourceToBundle(FhirIGBundle, content);
+                    resource = createResource(content);
+                    resource.request = addRequest(content.resourceType, content.id);
+                    addResourceToBundle(FhirIGBundle, resource);
                     console.log("Added Resource to Bundle");
                 }
                 catch(err){
@@ -31,7 +33,7 @@ async function installIGtoFHIRStore(){
         });
         writeBundletoFS(FhirIGBundle);
 //        const returnBundle = createFhirResource("Bundle", FhirIGBundle);
-        console.log(returnBundle);
+//        console.log(FhirIGBundle);
     });
 }
 
@@ -46,6 +48,22 @@ function createBundle(){
         "entry": []
     }
     return bundle;
+}
+
+function addRequest(resourceName, resourceID){
+ const request = {
+    "method": "PUT",
+    "url": resourceName + "/" + resourceID
+  }
+
+  return request;
+}
+
+function createResource(resource){
+    resource = {
+       resource
+    }
+    return resource;
 }
 
 function addResourceToBundle(bundle, resource){
@@ -66,11 +84,12 @@ async function createFhirResource(resourceType, body) {
   const parent = `projects/${projectId}/locations/${cloudRegion}/datasets/${datasetId}/fhirStores/${fhirStoreId}`;
 
   const request = {parent, type: resourceType, requestBody: JSON.stringify(body)};
+  console.log(`creating ig in ${fhirStoreId}`);
   const resource = await healthcare.projects.locations.datasets.fhirStores.fhir.create(
     request
   );
   console.log(`Created FHIR resource with ID ${resource.data.id}`);
-  console.log(resource.data);
+  //console.log(resource.data);
   return;
 }
 
