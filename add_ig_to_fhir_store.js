@@ -5,9 +5,8 @@ const healthcare = google.healthcare('v1');
 const cloudRegion = 'us-central1';
 const projectId = 'fhirfly';
 const datasetId = 'synthea';
-const fhirStoreId = 'plan-net';
+const fhirStoreId = 'carin-bb';
 const IG_DIRECTORY = 'C:\\Users\\richb\\Projects\\igs\\' + fhirStoreId + '\\full-ig\\site\\';
-const bFormatNDJSON = false;
 
 async function installIGtoFHIRStore(){
     var FhirIGBundle = createBundle();
@@ -17,7 +16,14 @@ async function installIGtoFHIRStore(){
         return;
         }
         filenames.forEach(function(filename) {
-            if ((filename.startsWith("CapabilityStatement") || filename.startsWith("Structure") || filename.startsWith("ValueSet") || filename.startsWith("CodeSystem")  || filename.startsWith("ImplementationGuide") || filename.startsWith("ImplementationGuide")) && filename.endsWith(".json")){
+            if ((
+                filename.startsWith("CapabilityStatement") || 
+                filename.startsWith("Structure") || 
+                filename.startsWith("ValueSet") || 
+                filename.startsWith("CodeSystem")  || 
+                filename.startsWith("CodeMap")  || 
+                filename.startsWith("ImplementationGuide") || 
+                filename.startsWith("SearchParameter")) && filename.endsWith(".json")){
                 try {
                     var content = fs.readFileSync(IG_DIRECTORY + filename);
                     var content = JSON.parse(content.toString());
@@ -32,8 +38,7 @@ async function installIGtoFHIRStore(){
             }
         });
         writeBundletoFS(FhirIGBundle);
-//        const returnBundle = createFhirResource("Bundle", FhirIGBundle);
-//        console.log(FhirIGBundle);
+        //const returnBundle = createFhirResource("Bundle", FhirIGBundle);
     });
 }
 
@@ -51,6 +56,7 @@ function createBundle(){
 }
 
 function addRequest(resourceName, resourceID){
+ //this is a put to preserve resource ids
  const request = {
     "method": "PUT",
     "url": resourceName + "/" + resourceID
